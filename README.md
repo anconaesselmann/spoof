@@ -1,7 +1,7 @@
 spoof
 =====
 
-#A script for MacOS to change the MAC address and computer name.
+####A script for MacOS to change the MAC address and computer name.
 
 ###Installation
 Download the repository and execute `spoof` from the terminal.
@@ -9,7 +9,8 @@ I suggest adding an alias to `spoof` to `/usr/path`, to enable
 spoofing by just typing `spoof` in a terminal window.
 
 Adding spoof to `/usr/path`:
-	sudo ln -s "/---the-location-of-the-spoof-repository---/spoof/spoof" "/usr/bin/spoof"
+
+	`$ sudo ln -s "/---the-location-of-the-spoof-repository---/spoof/spoof" "/usr/bin/spoof"`
 
 ###Usage:
 Type `spoof` into a terminal window.
@@ -18,5 +19,7 @@ Your computer's HostName, ComputerName and LocalHostName will be changed to a ra
 Your MAC address will be spoofed, including a random, valid vendor identifier. This change will not persist after rebooting.
 
 You can pass a string as an additional argument to spoof, which will set your computer's name:
-$ spoof "MyComputer"
+
+`$ spoof "MyComputer"`
+
 will spoof the MAC address and permanently change the computer's HostName, ComputerName and LocalHostName to "MyComputer"
