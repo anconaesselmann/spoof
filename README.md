@@ -37,6 +37,12 @@ The MAC address can be specifically set by passing a second argument:
 This will set both, the computer name, and the MAC address.
 
 =====
+####Known Issues:
+When reconnecting to the network, airport might connect to a different network, if the user has access to more than one.
+
+On operating systems older than 10.9 the network might not automatically reconnect. You will have to click on the Airport symbol in the menu bar and select your network.
+
+=====
 #####Tested on:
 
 Lion, Mountain Lion, Mavericks
