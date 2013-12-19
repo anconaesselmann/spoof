@@ -29,3 +29,9 @@ You can pass a string as an additional argument to spoof, which will set your co
 `$ spoof "MyComputer"`
 
 will spoof the MAC address and permanently change the computer's HostName, ComputerName and LocalHostName to "MyComputer"
+
+The MAC address can be specifically set by passing a second argument:
+
+`spoof "MyComputer" "00:15:45:AC:1F:80"`
+
+will set both, the computer name, and the MAC address.

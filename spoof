@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?php
-const CARD_NAME = "en0";
+$CARD_NAME = "en0";
 
 class RandNameGenerator {
 
@@ -48,8 +48,9 @@ class RandComputerNameGenerator extends RandNameGenerator {
 }
 
 function getMac() {
+	global $CARD_NAME;
 	$output = array();
-	exec("ifconfig ".CARD_NAME." | grep ether", $output);
+	exec("ifconfig ".$CARD_NAME." | grep ether", $output);
 	return explode(' ', $output[0])[1];
 }
 function getComputerName() {
@@ -70,6 +71,7 @@ function setComputerName($computerName) {
 	return $computerName;
 }
 function setMac($macAddress) {
+	global $CARD_NAME;
 	$result = false;
 	$mac = getMac();
 
@@ -79,7 +81,7 @@ function setMac($macAddress) {
 	exec($command);
 
 
-	$command = "sudo ifconfig ".CARD_NAME." ether ".$macAddress;
+	$command = "sudo ifconfig ".$CARD_NAME." ether ".$macAddress;
 	print "Attempting to change MAC address:\n\t$ ".$command."\n";
 	$output = array();
 	exec($command, $output);
@@ -89,6 +91,7 @@ function setMac($macAddress) {
 		$result = $newMac;
 	} else {
 		print "FAILURE\n";
+		$CARD_NAME = "en1";
 	}
 	return $result;
 }
@@ -103,8 +106,12 @@ function getRandomMac() {
 	print "\t".$macAddress." (".$vendorName.")\n";
 	return $macAddress;
 }
-function setRandomMac() {
-	$macAddress = getRandomMac();
+function setRandomMac($macAddress=false) {
+	if ($macAddress === false) {
+		$macAddress = getRandomMac();
+	} else {
+		print "MAC address provided:\n\t".$macAddress."\n";
+	}
 	return setMac($macAddress);
 }
 function setRandomComputerName() {
@@ -120,8 +127,9 @@ function setRandomComputerName() {
 }
 
 function getNetworkName() {
+	global $CARD_NAME;
 	$output = array();
-	exec('networksetup -getairportnetwork '.CARD_NAME, $output);
+	exec('networksetup -getairportnetwork '.$CARD_NAME, $output);
 	return explode(': ',$output[0])[1];
 }
 
@@ -130,18 +138,34 @@ $oldMac = getMac();
 $oldComputerName = getComputerName();
 if (count($argv) > 1) {
 	$newComputerName = setComputerName($argv[1]);
+	if (count($argv) > 2) {
+		$macAddress = $argv[2];
+		print $oldMac."\n".$macAddress."\n";
+		if (strtoupper($oldMac) == strtoupper($macAddress)) {
+			print "The MAC address you provided is identical to the current MAC address.\n";
+			exit;
+		}
+	} else {
+		$macAddress = false;
+	}
 } else {
-	#echo "generating random computer name\n";
 	$newComputerName = setRandomComputerName();
+	$macAddress = false;
 }
 $newMac = false;
+$failCount = 0;
 while ($newMac === false) {
-	$newMac = setRandomMac();
+	$newMac = setRandomMac($macAddress);
 	if ($newMac === false) {
+		$failCount++;
+		if ($failCount > 5) {
+			print "ERROR:\n\tThe MAC address could not be spoofed.\n";
+			exit;
+		}
 		sleep(1);
 	}
 }
-$command = 'networksetup -setairportpower '.CARD_NAME.' on';
+$command = 'networksetup -setairportpower '.$CARD_NAME.' on';
 print "Reconnecting wireless network:\n\t$ $command\n";
 exec($command);
 
