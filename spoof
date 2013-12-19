@@ -50,8 +50,10 @@ class RandComputerNameGenerator extends RandNameGenerator {
 function getMac() {
 	global $CARD_NAME;
 	$output = array();
-	exec("ifconfig ".$CARD_NAME." | grep ether", $output);
-	return explode(' ', $output[0])[1];
+	$command = "ifconfig ".$CARD_NAME." | grep ether";
+	exec($command, $output);
+	$all = explode(' ', $output[0]);
+	return $all[1];
 }
 function getComputerName() {
 	$output = array();
@@ -130,7 +132,8 @@ function getNetworkName() {
 	global $CARD_NAME;
 	$output = array();
 	exec('networksetup -getairportnetwork '.$CARD_NAME, $output);
-	return explode(': ',$output[0])[1];
+	$all = explode(': ',$output[0]);
+	return $all[1];
 }
 
 passthru('clear');
