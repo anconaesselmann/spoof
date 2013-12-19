@@ -1,39 +1,45 @@
 spoof
 =====
 
-####A script for MacOS to change the MAC address and computer name.
-
+#####A script for MacOS to change the MAC address and computer name.
+=====
 ###Installation
 
 Download the repository and execute `spoof` from the terminal.
 
-I suggest adding an alias to `spoof` to `/usr/path`, to enable
+I suggest adding an alias of `spoof` to `/usr/path`, to enable
 spoofing by just typing `spoof` in a terminal window.
 
 Adding spoof to `/usr/path`:
 
-	`$ sudo ln -s "/---the-location-of-the-spoof-repository---/spoof/spoof" "/usr/bin/spoof"`
-
+	$ sudo ln -s "/---the-location-of-the-spoof-repository---/spoof" "/usr/bin/spoof"
+=====
 ###Usage:
-Type `spoof` into a terminal window.
+1) Type `spoof` into a terminal window.
 
-Enter your password
+2) Enter your password
 
 Your computer's HostName, ComputerName and LocalHostName will be changed to a randomly generated name. This change persists after rebooting your computer.
 
 Your MAC address will be spoofed, including a random, valid vendor identifier. This change will not persist after rebooting.
 
+####Optional Usage:
 You can pass a string as an additional argument to spoof, which will set your computer's name:
 
-`$ spoof "MyComputer"`
+	$ spoof "MyComputer"
 
-will spoof the MAC address and permanently change the computer's HostName, ComputerName and LocalHostName to "MyComputer"
+This will spoof the MAC address and permanently change the computer's HostName, ComputerName and LocalHostName to "MyComputer"
 
 The MAC address can be specifically set by passing a second argument:
 
-`spoof "MyComputer" "00:15:45:AC:1F:80"`
+	$ spoof "MyComputer" "00:15:45:AC:1F:80"
 
-will set both, the computer name, and the MAC address.
+This will set both, the computer name, and the MAC address.
+
+=====
+#####Tested on:
+
+Lion, Mountain Lion, Mavericks
 
 =====
 I am a freelance software engineer, if this program is useful to you, please consider supporting me with a donation!
