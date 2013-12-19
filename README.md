@@ -8,7 +8,6 @@ spoof
 Download the repository and execute `spoof` from the terminal.
 
 I suggest adding an alias to `spoof` to `/usr/path`, to enable
-
 spoofing by just typing `spoof` in a terminal window.
 
 Adding spoof to `/usr/path`:
