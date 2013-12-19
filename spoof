@@ -1,0 +1,152 @@
+#!/usr/bin/php -q
+<?php
+const CARD_NAME = "en0";
+
+class RandNameGenerator {
+
+	public function randVowel() {
+		$vowels = array("a", "e", "i", "o", "u");
+	 	return $vowels[array_rand($vowels, 1)];
+	}
+
+	public function randConsonant() {
+	 	$consonants = array("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "ch", "sch", "qu", "st", "tt", "ss");
+	 	return $consonants[array_rand($consonants, 1)];
+	}
+	public function pattern() {
+		$patterns = array(
+			array(0,1,0,1,1),
+			array(0,1,0,1,0,1,0),
+			array(0,1,1,0),
+			array(1,0,1,1,0),
+			array(1,0,1,0,1,1,0),
+			array(1,1,0,1,0,1,1)
+		);
+		return $patterns[array_rand($patterns, 1)];
+	}
+	public function get() {
+		$pattern = $this->pattern();
+		$result = '';
+		foreach ($pattern as $value) {
+			if ($value === 0) {
+				$result .= $this->randConsonant();
+			} else $result .= $this->randVowel();
+		}
+		return ucfirst($result);
+	}
+}
+
+class RandComputerNameGenerator extends RandNameGenerator {
+	public function getSuffix() {
+		$suffixArray = array("HOME","Notebook","Laptop","LAPTOP","PC","Computer","COMPUTER","Mac","MAC","Macbook","MACBOOK","MAC-BOOK","Toshiba","Dell","mbp");
+	 	return $suffixArray[array_rand($suffixArray, 1)];
+	}
+	public function get() {
+		$name = parent::get();
+		return $name."-".$this->getSuffix();
+	}
+}
+
+function getMac() {
+	$output = array();
+	exec("ifconfig ".CARD_NAME." | grep ether", $output);
+	return explode(' ', $output[0])[1];
+}
+function getComputerName() {
+	$output = array();
+	exec("scutil --get ComputerName", $output);
+	return $output[0];
+}
+function setComputerName($computerName) {
+	$oldName = getComputerName();
+	$command1 = "sudo scutil --set HostName $computerName";
+	$command2 = "sudo scutil --set ComputerName $computerName";
+	$command3 = "sudo scutil --set LocalHostName $computerName";
+	print "Changing computer name:\n"."\t$ ".$command1."\n"."\t$ ".$command2."\n"."\t$ ".$command3."\n";
+	exec($command1);
+	exec($command2);
+	exec($command3);
+	exec("dscacheutil -flushcache");
+	return $computerName;
+}
+function setMac($macAddress) {
+	$result = false;
+	$mac = getMac();
+
+	$command = "sudo /System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport -z";
+	print("Disconnecting from wireless network:\n");
+	print ("\t$ ".$command."\n");
+	exec($command);
+
+
+	$command = "sudo ifconfig ".CARD_NAME." ether ".$macAddress;
+	print "Attempting to change MAC address:\n\t$ ".$command."\n";
+	$output = array();
+	exec($command, $output);
+	$newMac = getMac();
+	if ($mac != $newMac) {
+		print "SUCCESS\n";
+		$result = $newMac;
+	} else {
+		print "FAILURE\n";
+	}
+	return $result;
+}
+function getRandomMac() {
+	print("Random mac address:\n");
+	$data = file_get_contents(__DIR__ .'/vendorMacs.json');
+	$assocArray = json_decode($data, true);
+	$vendorMac = array_rand($assocArray);
+	$vendorName = $assocArray[$vendorMac];
+	$randomMac = exec("ruby -e 'puts (1..3).map{\"%0.2X\"%rand(256)}.join(\":\")'");
+	$macAddress = $vendorMac.":".$randomMac;
+	print "\t".$macAddress." (".$vendorName.")\n";
+	return $macAddress;
+}
+function setRandomMac() {
+	$macAddress = getRandomMac();
+	return setMac($macAddress);
+}
+function setRandomComputerName() {
+	$result = false;
+	$computerName = getComputerName();
+	$rng = new RandComputerNameGenerator();
+	setComputerName($rng->get());
+	$newComputerName = getComputerName();
+	if ($computerName != $newComputerName) {
+		$result = $newComputerName;
+	}
+	return $result;
+}
+
+function getNetworkName() {
+	$output = array();
+	exec('networksetup -getairportnetwork '.CARD_NAME, $output);
+	return explode(': ',$output[0])[1];
+}
+
+passthru('clear');
+$oldMac = getMac();
+$oldComputerName = getComputerName();
+if (count($argv) > 1) {
+	$newComputerName = setComputerName($argv[1]);
+} else {
+	#echo "generating random computer name\n";
+	$newComputerName = setRandomComputerName();
+}
+$newMac = false;
+while ($newMac === false) {
+	$newMac = setRandomMac();
+	if ($newMac === false) {
+		sleep(1);
+	}
+}
+$command = 'networksetup -setairportpower '.CARD_NAME.' on';
+print "Reconnecting wireless network:\n\t$ $command\n";
+exec($command);
+
+echo "Changes made:\n";
+echo "\tOld MAC: ".$oldMac."\n";
+echo "\tNew MAC: ".$newMac."\n\n";
+echo "\tOld Computer Name: ".$oldComputerName."\n";
+echo "\tNew Computer Name: ".$newComputerName."\n";
