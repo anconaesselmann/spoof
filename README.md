@@ -37,6 +37,6 @@ The MAC address can be specifically set by passing a second argument:
 will set both, the computer name, and the MAC address.
 
 =====
-I am a freelance software engineer, if this plugin is useful to you, please considder supporting me with a donation!
+I am a freelance software engineer, if this program is useful to you, please consider supporting me with a donation!
 
 <a href='https://pledgie.com/campaigns/22419'><img alt='Click here to lend your support to: Support the software you use! and make a donation at www.pledgie.com !' src='https://github.com/anconaesselmann/ClassesAndTests/raw/master/images/donate.png' border='0' ></a>
